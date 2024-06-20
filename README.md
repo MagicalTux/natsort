@@ -40,7 +40,7 @@ import (
     "fmt"
     "strings"
 
-    "facette.io/natsort"
+    "github.com/MagicalTux/natsort"
 )
 
 func main() {
