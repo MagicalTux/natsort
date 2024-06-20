@@ -1,4 +1,4 @@
-[![GoDoc](https://godoc.org/facette.io/natsort?status.svg)](https://godoc.org/facette.io/natsort)
+[![GoDoc](https://godoc.org/MagicalTux/natsort?status.svg)](https://godoc.org/MagicalTux/natsort)
 
 
 # natsort: natural strings sorting in Go

@@ -2,8 +2,11 @@ package natsort
 
 import (
 	"reflect"
+	"sort"
 	"strings"
 	"testing"
+
+	"github.com/maruel/natural"
 )
 
 var testList = []string{
@@ -166,5 +169,11 @@ func Test_Sort2(t *testing.T) {
 func BenchmarkSort1(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		Sort(testList)
+	}
+}
+
+func BenchmarkSortMaruelNatural(b *testing.B) {
+	for n := 0; n < b.N; n++ {
+		sort.Sort(natural.StringSlice(testList))
 	}
 }
