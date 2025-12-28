@@ -87,7 +87,8 @@ func Test_Sort1(t *testing.T) {
 		"Xiph Xlater 5000",
 		"Xiph Xlater 10000",
 	}
-	testListSorted := testList[:]
+	testListSorted := make([]string, len(testList))
+	copy(testListSorted, testList)
 	Sort(testListSorted)
 
 	if !reflect.DeepEqual(testListSortedOK, testListSorted) {
@@ -168,12 +169,92 @@ func Test_Sort2(t *testing.T) {
 
 func BenchmarkSort1(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		Sort(testList)
+		b.StopTimer()
+		list := make([]string, len(testList))
+		copy(list, testList)
+		b.StartTimer()
+		Sort(list)
 	}
 }
 
 func BenchmarkSortMaruelNatural(b *testing.B) {
 	for n := 0; n < b.N; n++ {
-		sort.Sort(natural.StringSlice(testList))
+		b.StopTimer()
+		list := make([]string, len(testList))
+		copy(list, testList)
+		b.StartTimer()
+		sort.Sort(natural.StringSlice(list))
+	}
+}
+
+func Test_Compare(t *testing.T) {
+	tests := []struct {
+		a, b     string
+		expected bool
+		desc     string
+	}{
+		// Basic comparisons
+		{"a", "b", true, "a < b"},
+		{"b", "a", false, "b > a"},
+		{"a", "a", false, "a == a"},
+		{"", "", false, "empty == empty"},
+		{"", "a", true, "empty < a"},
+		{"a", "", false, "a > empty"},
+
+		// Numeric comparisons
+		{"1", "2", true, "1 < 2"},
+		{"2", "1", false, "2 > 1"},
+		{"9", "10", true, "9 < 10"},
+		{"10", "9", false, "10 > 9"},
+		{"1", "10", true, "1 < 10"},
+		{"10", "1", false, "10 > 1"},
+
+		// Leading zeros
+		{"0", "1", true, "0 < 1"},
+		{"00", "1", true, "00 < 1"},
+		{"01", "1", false, "01 == 1"},
+		{"001", "1", false, "001 == 1"},
+		{"09", "10", true, "09 < 10"},
+		{"009", "10", true, "009 < 10"},
+
+		// Leading zeros followed by non-digit (the bug we fixed)
+		{"0a", "1", true, "0a < 1 (0 < 1, then compare suffix)"},
+		{"00a", "1", true, "00a < 1 (0 < 1, then compare suffix)"},
+		{"0a", "0b", true, "0a < 0b (equal numbers, a < b)"},
+		{"0z", "1a", true, "0z < 1a (0 < 1)"},
+
+		// Mixed alphanumeric
+		{"a1", "a2", true, "a1 < a2"},
+		{"a2", "a10", true, "a2 < a10"},
+		{"a10", "a2", false, "a10 > a2"},
+		{"z1.doc", "z2.doc", true, "z1.doc < z2.doc"},
+		{"z2.doc", "z10.doc", true, "z2.doc < z10.doc"},
+		{"z10.doc", "z2.doc", false, "z10.doc > z2.doc"},
+
+		// Equal strings
+		{"abc", "abc", false, "abc == abc"},
+		{"123", "123", false, "123 == 123"},
+		{"a1b2", "a1b2", false, "a1b2 == a1b2"},
+	}
+
+	for _, tt := range tests {
+		result := Compare(tt.a, tt.b)
+		if result != tt.expected {
+			t.Errorf("Compare(%q, %q) = %v, expected %v (%s)", tt.a, tt.b, result, tt.expected, tt.desc)
+		}
+	}
+}
+
+func Test_SortEdgeCases(t *testing.T) {
+	// Test sorting with leading zeros followed by non-digits
+	input := []string{"1a", "0b", "00c", "2a", "0a"}
+	expected := []string{"0a", "0b", "00c", "1a", "2a"}
+
+	result := make([]string, len(input))
+	copy(result, input)
+	Sort(result)
+
+	if !reflect.DeepEqual(expected, result) {
+		t.Errorf("Sort edge case failed:\nExpected: %v\nGot: %v", expected, result)
 	}
 }
