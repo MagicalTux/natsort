@@ -1,5 +1,6 @@
 [![GoDoc](https://godoc.org/github.com/MagicalTux/natsort?status.svg)](https://godoc.org/github.com/MagicalTux/natsort)
-
+[![Test](https://github.com/MagicalTux/natsort/actions/workflows/test.yml/badge.svg)](https://github.com/MagicalTux/natsort/actions/workflows/test.yml)
+[![Coverage Status](https://coveralls.io/repos/github/MagicalTux/natsort/badge.svg?branch=master)](https://coveralls.io/github/MagicalTux/natsort?branch=master)
 
 # natsort: natural strings sorting in Go
 
